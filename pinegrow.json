@@ -1,0 +1,12 @@
+{
+  "breakpoints": [
+    "640px",
+    "768px",
+    "1024px",
+    "1280px",
+    "1536px"
+  ],
+  "ai-project-brief": null,
+  "template_framework_id": "vue",
+  "open-pages": []
+}
