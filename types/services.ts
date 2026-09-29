@@ -14,4 +14,3 @@ export type Service = {
 }
 
 export type Services = Service[]
-
