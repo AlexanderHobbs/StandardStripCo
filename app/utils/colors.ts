@@ -3,7 +3,7 @@
 import { kebabCase, camelCase, upperFirst, omit } from './index'
 import type { Config as TWConfig } from 'tailwindcss'
 import defaultColors from 'tailwindcss/colors.js'
-import { pg_colors } from '../../themes/pg-tailwindcss/tokens.mjs'
+import { colors as pg_colors } from '../theme/tokens'
 // @ts-ignore
 delete defaultColors.lightBlue
 // @ts-ignore

@@ -12,6 +12,13 @@
     }
   })
 
+  // Quote CTAs: the contact page is the destination itself, and blog posts
+  // carry their own in-article CTA.
+  const showEndBanner = computed(
+    () => route.path !== '/contact' && !route.path.startsWith('/blog/'),
+  )
+  const showStickyBar = computed(() => route.path !== '/contact')
+
   useHeadAndMeta(pageMeta)
   useOgImage()
 </script>
@@ -20,15 +27,19 @@
   <div>
     <!-- <div class="container mx-auto"> -->
     <div
-      class="min-h-screen flex flex-col bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+      class="min-h-screen flex flex-col pb-20 lg:pb-0 bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
     >
-      <NavBar class="fixed shadow z-20 bg-white dark:bg-neutral-950" />
+      <NavBar
+        class="fixed z-20 bg-white/70 dark:bg-neutral-950/70 backdrop-blur-md border-b border-neutral-200/60 dark:border-neutral-800/60"
+      />
       <div class="mt-24">
         <main class="shadow">
           <slot />
         </main>
       </div>
+      <QuoteBanner v-if="showEndBanner" />
       <TheFooter />
+      <StickyQuoteBar v-if="showStickyBar" />
     </div>
     <!-- </div> -->
   </div>

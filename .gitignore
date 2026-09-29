@@ -9,13 +9,6 @@ dist
 .DS_Store
 .unlighthouse
 
-# Pinegrow
-_pgbackup
-_pginfo
-
-## optional
-# pinegrow.json
-
 ## optional
 ## Uncomment the below as per your needs
 ## add any d.ts files that are auto-generated, for eg,

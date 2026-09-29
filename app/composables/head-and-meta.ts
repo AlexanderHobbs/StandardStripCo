@@ -1,22 +1,24 @@
 import siteMeta from '@/site'
 
-import { heroImageUrl } from '@/utils/hero'
 import { fontUrls } from '@/utils/font'
 
 import checkDarkTheme from '@/composables/dark-color-scheme-check?raw'
 import type { Script } from '@unhead/schema'
-type TurboScript = Script & { once: true }
+
+type TurboScript = Omit<Script, 'async'> & {
+  async?: false
+  once: true
+}
 
 export const useHeadAndMeta = (pageMeta: ComputedRef) => {
   const {
     title: siteTitle,
     description: siteDescription,
     url: siteUrl,
-    ogImageUrl: siteOgImageUrl,
-    generator: siteGenerator,
     author,
     twitter,
     titleSeparator,
+    business,
   } = siteMeta
 
   const link: any = [
@@ -34,20 +36,22 @@ export const useHeadAndMeta = (pageMeta: ComputedRef) => {
     //       href,
     //     } as const),
     // ),
-    {
-      rel: 'icon',
-      // type: 'image/x-icon',
-      type: 'image/svg+xml',
-      href: '/favicon.svg',
-    },
   ]
   const noscript: any = []
 
-  const canonicalUrl = pageMeta.value.canonicalUrl || siteUrl
-  if (canonicalUrl) {
-    // Canonical URL
-    link.push({ rel: 'canonical', href: canonicalUrl.href })
-  }
+  const route = useRoute()
+
+  // Absolute, normalised canonical URL for the current page (query strings and
+  // hashes are dropped so filtered/tracked URLs don't split ranking signals).
+  const canonicalHref = computed(() => {
+    const path = pageMeta.value.canonicalUrl || route.path
+    const url = new URL(path, siteUrl)
+    if (url.pathname !== '/') {
+      url.pathname = url.pathname.replace(/\/+$/, '')
+    }
+    return url.origin + url.pathname
+  })
+  link.push({ rel: 'canonical', href: canonicalHref })
 
   if (fontUrls.length) {
     // Font preloads
@@ -70,26 +74,20 @@ export const useHeadAndMeta = (pageMeta: ComputedRef) => {
     )
   }
 
+  // Page title only (e.g. "Services"); the site name is appended by the
+  // titleTemplate below, so pages that call useHead({ title }) get it too.
+  const pageTitle = computed(() => pageMeta.value.title as string | undefined)
   const title = computed(() =>
-    pageMeta.value.title
-      ? `${pageMeta.value.title} ${titleSeparator} ${siteTitle}`
+    pageTitle.value
+      ? `${pageTitle.value} ${titleSeparator} ${siteTitle}`
       : siteTitle,
   )
 
   // Manage head with useHead
   useHead({
-    title, // title is defined statically using definePageMeta in pages and resolved here. For dynamic routes, this resolved title is further overridden within the dynamic route itself (e.g., [slug]) using a second useHead.
-
-    // Other unused params - titleTemplate, templateParams
-    titleTemplate: null,
-
-    // Instead of setting other meta here, useServerSeoMeta is used.
-    meta: [
-      {
-        name: 'twitter:url',
-        content: canonicalUrl.href,
-      },
-    ],
+    title: pageTitle, // defined statically using definePageMeta in pages. Dynamic routes (e.g., [slug]) override it via usePageSeo.
+    titleTemplate: (t?: string) =>
+      t && t !== siteTitle ? `${t} ${titleSeparator} ${siteTitle}` : siteTitle,
 
     // useScript can also be used to load scripts
     script: [{ innerHTML: checkDarkTheme, once: true } as TurboScript],
@@ -103,54 +101,34 @@ export const useHeadAndMeta = (pageMeta: ComputedRef) => {
   const description = computed(
     () => pageMeta.value.description || siteDescription,
   )
-  const generator = computed(() => pageMeta.value.generator || siteGenerator)
   const keywords = computed(() => pageMeta.value.tags?.toString())
-
-  let siteOgImage: string = siteUrl
-
-  try {
-    siteOgImage = new URL(siteOgImageUrl, siteUrl).href
-  } catch (err) {
-    // console.log(err)
-  }
-
-  const ogImage = pageMeta.value.ogImage || siteOgImage || heroImageUrl
-
-  if (ogImage.src) {
-    // If pageMeta.ogImage was imported within the app, Vite returns it as an object with src, width, height etc. So, replace src with url
-    ogImage.url = ogImage.src
-    delete ogImage.src
-  }
 
   // Manage head meta with useSeoMeta
   useServerSeoMeta({
-    title,
     description,
     author,
     charset: 'utf-8', // defaulted by nuxt
     viewport: 'width=device-width, initial-scale=1', // defaulted by nuxt
-    generator,
     keywords,
 
     // // Open Graph / Facebook / LinkedIn / Discord
     ogTitle: title, // set by @nuxtjs/seo's nuxt-seo-utils
     ogDescription: description, // set by @nuxtjs/seo's nuxt-seo-utils
-    ogType: 'website', // set by @nuxtjs/seo's nuxt-seo-utils
-    ogImage: ogImage, // set by @nuxtjs/seo's nuxt-og-image
+    ogType: pageMeta.value.ogType || 'website',
     ogImageAlt: title, // set by @nuxtjs/seo's nuxt-og-image
     // // Other values - og:image:width, og:image:height, og:image:alt, og:image:type, og:image:secure_url
-    ogUrl: canonicalUrl.href,
-    ogSiteName: title,
+    ogUrl: canonicalHref,
+    ogSiteName: siteTitle,
     // // Other values - og: locale, og: type
 
     // // Twitter (X)
     twitterCard: 'summary_large_image', // set by @nuxtjs/seo & nuxt-og-image
     twitterTitle: title,
     twitterDescription: description,
-    twitterImage: ogImage, // set by @nuxtjs/seo & nuxt-og-image
     twitterImageAlt: title,
-    twitterSite: twitter,
-    twitterCreator: '@techakayy',
+    ...(twitter
+      ? { twitterSite: `@${twitter}`, twitterCreator: `@${twitter}` }
+      : {}),
   })
 
   // Manage schema-org with useSchemaOrg
@@ -158,8 +136,67 @@ export const useHeadAndMeta = (pageMeta: ComputedRef) => {
   // https://nuxtseo.com/learn/mastering-meta/schema-org#reactivity-with-useschemaorg
   useSchemaOrg([
     defineWebSite({
-      name: title,
+      name: siteTitle,
+      description: siteDescription,
     }),
+    // name, description and url are inferred from the resolved <title>,
+    // description meta and canonical link, so per-page overrides are respected.
     defineWebPage(),
+    // Site-wide business entity; Service and BlogPosting nodes on inner pages
+    // reference it through its @id (`${siteUrl}/#identity`).
+    defineLocalBusiness({
+      name: business.name,
+      url: siteUrl,
+      logo: '/android-chrome-512x512.png',
+      description: siteDescription,
+      telephone: business.phone,
+      email: business.email,
+      ...(business.address
+        ? { address: { '@type': 'PostalAddress', ...business.address } }
+        : {}),
+      ...(business.areaServed.length
+        ? { areaServed: business.areaServed }
+        : {}),
+    } as any),
   ])
+}
+
+// Meta descriptions display best at ~155 characters: cut on a word boundary
+// and add an ellipsis rather than stopping mid-sentence.
+const trimDescription = (text?: string, max = 155) => {
+  if (!text || text.length <= max) return text
+  return text.slice(0, max).replace(/[\s,;:.-]*\S*$/, '') + '…'
+}
+
+type MaybeGetter<T> = T | Ref<T> | (() => T)
+
+// For dynamic pages ([slug]) whose title/description come from data. Keeps the
+// <title>, description, Open Graph and Twitter tags in sync with each other.
+export const usePageSeo = (opts: {
+  title: MaybeGetter<string | undefined>
+  description: MaybeGetter<string | undefined>
+  ogType?: 'website' | 'article'
+  keywords?: MaybeGetter<string | undefined>
+}) => {
+  const { title: siteTitle, titleSeparator } = siteMeta
+  const pageTitle = computed(() => toValue(opts.title))
+  const fullTitle = computed(() =>
+    pageTitle.value
+      ? `${pageTitle.value} ${titleSeparator} ${siteTitle}`
+      : siteTitle,
+  )
+  const description = computed(() => trimDescription(toValue(opts.description)))
+
+  useHead({ title: pageTitle })
+  useServerSeoMeta({
+    ogTitle: fullTitle,
+    twitterTitle: fullTitle,
+    ogImageAlt: fullTitle,
+    twitterImageAlt: fullTitle,
+    description,
+    ogDescription: description,
+    twitterDescription: description,
+    ogType: opts.ogType || 'website',
+    keywords: computed(() => toValue(opts.keywords)),
+  })
 }

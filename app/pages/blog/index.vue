@@ -4,10 +4,10 @@
     // name: 'blog',
     // alias: 'blog',
     title: 'Blog',
-    description: 'Read, Learn, Enjoy: Your Blog Destination!',
+    description: 'Parking lot maintenance tips, guides, and industry news.',
     navOrder: 5,
     type: 'secondary',
-    icon: 'i-mdi-home',
+    icon: 'i-mdi-post-outline',
     // ogImage: 'images/ogImage.png', // url or local images inside public folder, for eg, ~/public/images/ogImage.png
   })
 </script>
@@ -16,18 +16,12 @@
     <TheHeader>
       <div>
         <div class="flex items-center">
-          <h2 class="text-5xl">Blog</h2>
+          <h1 class="text-5xl">Blog</h1>
         </div>
         <div class="flex items-center mt-2">
-          <h6 class="mt-2">Source for this blog</h6>
-          <BaseButton
-            size="xs"
-            class="ml-2"
-            color="secondary"
-            to="https://github.com/vuejs/blog"
-            target="_blank"
-            ><span>Click here</span>
-          </BaseButton>
+          <h6 class="mt-2">
+            Parking lot maintenance tips, guides, and industry news.
+          </h6>
         </div>
         <slot />
       </div>

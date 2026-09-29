@@ -13,14 +13,6 @@
   const { data: post } = await useAsyncData(path, () => {
     return queryContent(base, path).findOne()
   })
-
-  useServerSeoMeta({
-    description: () => post.value?.title,
-  })
-
-  useHead({
-    title: () => post.value?.title,
-  })
 </script>
 <template>
   <div

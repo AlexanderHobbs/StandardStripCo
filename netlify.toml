@@ -4,3 +4,21 @@ publish = "dist"
 
 [build.environment]
 NODE_VERSION = "20.14.0"
+
+# Old URL -> new URL, so existing links/rankings aren't lost
+[[redirects]]
+  from = "/gallery"
+  to = "/our-work"
+  status = 301
+
+# Fingerprinted build assets never change - cache them for a year (Core Web Vitals)
+[[headers]]
+  for = "/_nuxt/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

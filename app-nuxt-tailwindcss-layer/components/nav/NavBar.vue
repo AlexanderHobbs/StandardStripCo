@@ -1,42 +1,30 @@
 <script setup lang="ts">
-  const { allNavs, navsPrimary, navsSecondary, currentPath } = useNavMenu()
+  const { allNavs, currentPath } = useNavMenu()
 </script>
 <template>
   <div class="w-full">
-    <nav class>
+    <nav>
       <div class="container mx-auto px-4 sm:px-6">
-        <div class="flex h-24 items-center justify-between">
-          <div class="flex items-center justify-between w-full">
-            <div class="flex flex-shrink-0 items-center">
-              <TheLogo />
-            </div>
-            <NavPrimary
-              :navs="navsPrimary"
-              :current-path="currentPath"
-              class="hidden sm:flex sm:ml-6"
-            />
+        <div
+          class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4 lg:h-24 lg:flex-nowrap lg:py-0"
+        >
+          <div class="flex flex-shrink-0 items-center">
+            <TheLogo />
           </div>
-          <DarkModeSwitch />
-          <div class="-mr-2 items-center relative">
-            <NavHamburger
-              v-if="navsSecondary?.length"
-              class="hidden sm:block"
-            />
-            <NavHamburger v-if="allNavs.length" class="sm:hidden" />
-            <NavSecondary
-              v-if="navsSecondary?.length"
-              class="hidden sm:flex sm:justify-end absolute right-0 mt-4"
-              :navs="navsSecondary"
-              :current-path="currentPath"
-            />
-          </div>
+          <NavPrimary
+            :navs="allNavs"
+            :current-path="currentPath"
+            class="order-3 w-full lg:order-none lg:ml-auto lg:w-auto"
+          />
+          <BaseButton
+            to="/contact"
+            class="whitespace-nowrap"
+            label="Get in Contact"
+          >
+            Get in Contact
+          </BaseButton>
         </div>
       </div>
-      <NavSecondary
-        class="sm:hidden"
-        :navs="allNavs"
-        :current-path="currentPath"
-      />
     </nav>
   </div>
 </template>

@@ -18,11 +18,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
 
   "search.exclude": {
-    "**/_pgbackup": true,
     ".nuxt": true,
     ".output": true,
     "dist": true,
-    "tailwind_theme": true,
     ".unlighthouse": true
   }
 }

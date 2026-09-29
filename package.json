@@ -1,16 +1,16 @@
 {
-  "name": "happy-paws-with-nuxt-tailwindcss",
+  "name": "prostripe-parking-lot-services",
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://happy-paws-with-nuxt-tailwindcss.netlify.app",
+  "homepage": "https://prostripe-parking-lot-services.netlify.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pinegrow/happy-paws-with-nuxt-tailwindcss.git"
+    "url": "https://github.com/AlexanderHobbs/prostripe-parking-lot-services.git"
   },
   "scripts": {
     "dev": "nuxt dev",
     "now": "npm run build && npm run preview",
-    "lighthouse": "npx unlighthouse --no-cache --site https://happy-paws-with-nuxt-tailwindcss.netlify.app",
+    "lighthouse": "npx unlighthouse --no-cache --site https://prostripe-parking-lot-services.netlify.app",
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -24,6 +24,7 @@
     "@pinia/nuxt": "^0.5.4",
     "@vee-validate/nuxt": "^4.13.2",
     "@vueuse/core": "^11.0.3",
+    "leaflet": "^1.9.4",
     "lite-youtube-embed": "^0.3.3",
     "pinia": "^2.2.2"
   },
@@ -37,12 +38,12 @@
     "@nuxtjs/fontaine": "^0.4.4",
     "@nuxtjs/html-validator": "^1.8.2",
     "@nuxtjs/seo": "^2.0.0-rc.19",
-    "@pinegrow/nuxt-module": "^3.0.75",
-    "@pinegrow/tailwindcss-plugin": "^4.2.6",
     "@resvg/resvg-js": "^2.5.0",
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/typography": "^0.5.16",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^22.10.6",
+    "@unhead/schema-org": "^1.11.18",
     "@unocss/nuxt": "^65.4.0",
     "@unocss/preset-icons": "^0.62.3",
     "@vueuse/nuxt": "^12.4.0",
@@ -57,14 +58,5 @@
     "rehype-external-links": "^3.0.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "nuxi": "3.8.4"
-    }
-  },
-  "overrides": {
-    "nuxi": "3.8.4"
-  },
-  "web-types": "web-types.json"
+  }
 }

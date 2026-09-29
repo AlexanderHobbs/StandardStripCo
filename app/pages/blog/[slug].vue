@@ -1,4 +1,6 @@
 <script setup lang="ts">
+  import siteMeta from '@/site'
+
   definePageMeta({
     // layout: 'default',
     // name: 'slug',
@@ -30,13 +32,42 @@
     return { twitter, avatar, gravatar, author }
   })
 
-  useServerSeoMeta({
-    description: () => post.value?.title,
+  usePageSeo({
+    title: () => post.value?.title,
+    description: () => post.value?.description || post.value?.title,
+    ogType: 'article',
   })
 
-  useHead({
-    title: () => post.value?.title,
+  const publishedAt = computed(() =>
+    post.value?.date ? new Date(post.value.date).toISOString() : undefined,
+  )
+
+  useServerSeoMeta({
+    articlePublishedTime: publishedAt,
+    articleAuthor: () => (post.value?.author ? [post.value.author] : undefined),
   })
+
+  useSchemaOrg([
+    {
+      '@type': 'BlogPosting',
+      headline: post.value?.title,
+      description: post.value?.description,
+      datePublished: publishedAt.value,
+      dateModified: publishedAt.value,
+      author: {
+        '@type': 'Organization',
+        name: post.value?.author || siteMeta.business.name,
+      },
+      publisher: { '@id': `${siteMeta.url}/#identity` },
+    },
+    defineBreadcrumb({
+      itemListElement: [
+        { name: 'Home', item: '/' },
+        { name: 'Blog', item: '/blog' },
+        { name: post.value?.title },
+      ],
+    }),
+  ])
 </script>
 <template>
   <section>
@@ -66,11 +97,21 @@
             >
               <TheAuthor v-bind="author" />
               <TableOfContents :post="post" class="hidden xl:block" />
+              <QuoteBanner
+                variant="compact"
+                title="Want a free quote?"
+                class="mt-6"
+              />
             </div>
             <div
               class="dark:divide-gray-700 divide-gray-200 divide-y xl:col-span-3 xl:pb-0 xl:row-span-2"
             >
               <StaticMarkdown base="blog" :path="slug" />
+              <QuoteBanner
+                variant="card"
+                title="Need Help With Your Parking Lot?"
+                text="Get a free, no-obligation quote from our licensed & insured crew."
+              />
             </div>
             <div class="hidden">
               <footer

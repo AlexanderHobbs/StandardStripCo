@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'node:url'
 import { resolve } from 'pathe'
 import presetIcons from '@unocss/preset-icons'
 import { bundledLanguages } from 'shiki'
@@ -9,7 +8,6 @@ const {
   description,
   url,
   defaultLocale,
-  identity,
   twitter,
   trailingSlash,
   titleSeparator,
@@ -57,7 +55,6 @@ export default defineNuxtConfig({
   },
 
   modules: [
-    '@pinegrow/nuxt-module',
     '@unocss/nuxt',
     '@nuxt/content',
     '@vueuse/nuxt',
@@ -125,7 +122,7 @@ export default defineNuxtConfig({
     // sizes: 'xs:100vw sm:100vw md:100vw lg:100vw xl:100vw', // Global sizes not yet supported, has to be specified in NuxtImg or NuxtPicture tags - https://github.com/nuxt/image/issues/216
     // densities: [1,2], // default
     // quality: 80, // can be overridden as NuxtImg prop
-    format: ['webp, png, jpg'], // default is ['webp']
+    format: ['webp', 'png', 'jpg'], // default is ['webp']
     // The screen sizes predefined by `@nuxt/image`:
     // screens: {
     //   xs: 320,
@@ -153,17 +150,7 @@ export default defineNuxtConfig({
     // netlify: {
     //   baseURL: url,
     // },
-    domains: [
-      'images.unsplash.com',
-      'fakestoreapi.com',
-      'res.cloudinary.com',
-      'avatars.githubusercontent.com',
-      'gravatar.com',
-    ],
-
-    alias: {
-      unsplash: 'https://images.unsplash.com',
-    },
+    domains: ['placehold.co'],
   },
 
   veeValidate: {
@@ -236,8 +223,6 @@ export default defineNuxtConfig({
     name: title,
     description,
     defaultLocale,
-    // https://nuxtseo.com/docs/schema-org/guides/setup-identity
-    identity,
     twitter,
     trailingSlash,
     titleSeparator,
@@ -249,6 +234,13 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
+    // Give crawlers freshness/priority hints (build time = last deploy).
+    defaults: {
+      lastmod: new Date().toISOString(),
+      changefreq: 'monthly',
+      priority: 0.7,
+    },
+    urls: [{ loc: '/', priority: 1, changefreq: 'weekly' }],
     // https://nuxtseo.com/docs/sitemap/getting-started/troubleshooting
     // Open {{site.url}}/sitemap.xml
     xslColumns: [
@@ -272,7 +264,7 @@ export default defineNuxtConfig({
     defaults: {
       extension: 'jpeg',
     },
-    // OG images and nuxtseo features can be previewed with nuxt-devtools during development. OG images can also be viewed using URL in this form - `/__og-image__/image/<path>/og.<extension>. For eg, https://happy-paws-with-nuxt-tailwindcss.netlify.app/__og-image__/image/og.png
+    // OG images and nuxtseo features can be previewed with nuxt-devtools during development. OG images can also be viewed using URL in this form - `/__og-image__/image/<path>/og.<extension>`.
     // fonts: ['Inter:400', 'Inter:700'],
     //
     // defaults: { width: 1200, height: 600, emojis: 'noto', renderer: 'satori', component: 'NuxtSeo', cacheMaxAgeSeconds: 60 * 60 * 24 * 3 },
@@ -283,7 +275,6 @@ export default defineNuxtConfig({
 
   linkChecker: {
     enabled: false,
-    excludeLinks: ['https://twitter.com/vuedesigner'],
     report: {
       html: true,
       markdown: true,
@@ -292,9 +283,10 @@ export default defineNuxtConfig({
 
   unocss: {
     presets: [
+      // Cast to any to avoid type conflicts between different @unocss/core instances
       presetIcons({
         prefix: 'i-', // default prefix, do not change
-      }),
+      }) as any,
     ],
   },
 
@@ -311,29 +303,6 @@ export default defineNuxtConfig({
     //   },
     // },
     // ...
-  },
-
-  pinegrow: {
-    liveDesigner: {
-      iconPreferredCase: 'unocss', // default value (can be removed), Nuxt UI uses the unocss format for icon names
-      tailwindcss: {
-        /* Please ensure that you update the filenames and paths to accurately match those used in your project. */
-        configPath: 'tailwind.config.ts',
-        cssPath: '@/assets/css/tailwind.css',
-        // themePath: false, // Set to false so that Design Panel is not used
-        // restartOnConfigUpdate: true,
-        // restartOnThemeUpdate: true,
-      },
-      // plugins: [
-      //   {
-      //     name: 'My Awesome Lib 3.0',
-      //     key: 'my-awesome-lib',
-      //     pluginPath: fileURLToPath(
-      //       new URL('./web-types/my-awesome-lib.json', import.meta.url),
-      //     ),
-      //   },
-      // ],
-    },
   },
 
   compatibilityDate: '2025-01-14',

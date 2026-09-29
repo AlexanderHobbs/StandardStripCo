@@ -1,4 +1,4 @@
-import { pg_font_urls } from '../../themes/pg-tailwindcss/tokens.mjs'
+import { fontUrls as pg_font_urls } from '../theme/tokens'
 
 const getFontsWithFallback = (pg_fonts) => {
   const pg_fonts_with_fallback = { ...pg_fonts }
